@@ -194,23 +194,28 @@ onMounted(() => {
         player.velocity.y = 5;
         break;
       case " ":
-        // player.attack();
+        e.preventDefault();
+        player.attack();
         break;
 
       case "ArrowRight":
+        e.preventDefault();
         keys.ArrowRight.pressed = true;
         enemy.lastKey = "ArrowRight";
         break;
       case "ArrowLeft":
+        e.preventDefault();
         keys.ArrowLeft.pressed = true;
         enemy.lastKey = "ArrowLeft";
         break;
       case "ArrowUp":
+        e.preventDefault();
         enemy.velocity.y = -15;
         break;
       case "ArrowDown":
+        e.preventDefault();
         // enemy.velocity.y = 5;
-        // enemy.attack();
+        enemy.attack();
         break;
     }
   });
