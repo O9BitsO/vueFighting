@@ -1,119 +1,322 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from '@/components/HelloWorld.vue'
+import Fighter from './classes/Fighter';
+import { onMounted } from 'vue';
+
+onMounted(() => {
+  function rectangularCollision({ rectangle1, rectangle2 }: { rectangle1: Fighter, rectangle2: Fighter }) {
+    return (
+      rectangle1.attackBox.position.x + rectangle1.attackBox.width >=
+      rectangle2.position.x &&
+      rectangle1.attackBox.position.x <=
+      rectangle2.position.x + rectangle2.width &&
+      rectangle1.attackBox.position.y + rectangle1.attackBox.height >=
+      rectangle2.position.y &&
+      rectangle1.attackBox.position.y <= rectangle2.position.y + rectangle2.height
+    );
+  }
+
+  function determineWinner({ player, enemy, timerId }: { player: Fighter, enemy: Fighter, timerId: number }) {
+    clearTimeout(timerId);
+    let resultBox = <HTMLElement>document.querySelector("#result");
+    if (resultBox) {
+      if (player.health === enemy.health) {
+        resultBox.innerHTML = "Tie";
+        resultBox.style.display = "flex";
+      }
+      if (player.health > enemy.health) {
+        resultBox.innerHTML = "Player 1 Win";
+        resultBox.style.display = "flex";
+      }
+      if (player.health < enemy.health) {
+        resultBox.innerHTML = "Player 2 Win";
+        resultBox.style.display = "flex";
+      }
+    }
+
+  }
+
+  let timer = 60;
+  let timerId: number;
+  function decreaseTimer() {
+    if (timer > 0) {
+      timerId = setTimeout(decreaseTimer, 1000);
+      timer -= 1;
+      let timerBox = document.querySelector("#timer");
+      if (timerBox)
+        timerBox.innerHTML = timer.toString();
+    }
+    if (timer === 0) {
+      determineWinner({ player, enemy, timerId });
+    }
+  }
+  const canvas = document.querySelector('canvas');
+  const c = canvas?.getContext('2d');
+  if (canvas && c) {
+    canvas.width = 1024;
+    canvas.height = 576;
+    c.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  const gravity = 0.7;
+
+  const player = new Fighter({
+    position: {
+      x: 0,
+      y: 0,
+    },
+    velocity: {
+      x: 0,
+      y: 0,
+    },
+    color: "red",
+    offset: {
+      x: 0,
+      y: 0,
+    },
+  });
+
+  const enemy = new Fighter({
+    position: {
+      x: 400,
+      y: 100,
+    },
+    velocity: {
+      x: 0,
+      y: 0,
+    },
+    color: "blue",
+    offset: {
+      x: -50,
+      y: 0,
+    },
+  });
+
+  if (c) {
+    player.draw(c);
+    enemy.draw(c);
+  }
+
+  const keys = {
+    a: {
+      pressed: false,
+    },
+    d: {
+      pressed: false,
+    },
+    w: {
+      pressed: false,
+    },
+    s: {
+      pressed: false,
+    },
+    ArrowRight: {
+      pressed: false,
+    },
+    ArrowLeft: {
+      pressed: false,
+    },
+    ArrowUp: {
+      pressed: false,
+    },
+    ArrowDown: {
+      pressed: false,
+    },
+  };
+
+  decreaseTimer();
+
+  function animate() {
+    window.requestAnimationFrame(animate);
+    if (c && canvas) {
+      c.fillStyle = 'black';
+      c.fillRect(0, 0, canvas.width, canvas.height);
+      player.update(c, canvas, gravity);
+      enemy.update(c, canvas, gravity);
+
+      // Movement
+
+      player.velocity.x = 0;
+      if (keys.a.pressed && player.lastKey === "a") {
+        player.velocity.x = -5;
+      } else if (keys.d.pressed && player.lastKey === "d") {
+        player.velocity.x = 5;
+      }
+
+      enemy.velocity.x = 0;
+      if (keys.ArrowLeft.pressed && enemy.lastKey === "ArrowLeft") {
+        enemy.velocity.x = -5;
+      } else if (keys.ArrowRight.pressed && enemy.lastKey === "ArrowRight") {
+        enemy.velocity.x = 5;
+      }
+
+      // Colision detection
+      let playerHealthBox = <HTMLElement>document.querySelector("#playerHealth");
+      let enemyHealthBox = <HTMLElement>document.querySelector("#enemyHealth");
+      if (
+        rectangularCollision({ rectangle1: player, rectangle2: enemy }) &&
+        player.isAttacking
+      ) {
+        player.isAttacking = false;
+        enemy.color = "green";
+        enemy.health -= 10;
+        if (enemyHealthBox) enemyHealthBox.style.width = enemy.health + "%";
+      } else enemy.color = "blue";
+
+      if (
+        rectangularCollision({ rectangle1: enemy, rectangle2: player }) &&
+        enemy.isAttacking
+      ) {
+        enemy.isAttacking = false;
+        player.color = "green";
+        player.health -= 10;
+        if (playerHealthBox) playerHealthBox.style.width = player.health + "%";
+      } else player.color = "red";
+    }
+    // end game
+    if (enemy.health <= 0 || player.health <= 0) determineWinner({ player, enemy, timerId });
+  }
+
+  animate();
+  window.addEventListener("keydown", function (e) {
+    switch (e.key) {
+      case "d":
+        keys.d.pressed = true;
+        player.lastKey = "d";
+        break;
+      case "a":
+        keys.a.pressed = true;
+        player.lastKey = "a";
+        break;
+      case "w":
+        player.velocity.y = -15;
+        break;
+      case "s":
+        player.velocity.y = 5;
+        break;
+      case " ":
+        // player.attack();
+        break;
+
+      case "ArrowRight":
+        keys.ArrowRight.pressed = true;
+        enemy.lastKey = "ArrowRight";
+        break;
+      case "ArrowLeft":
+        keys.ArrowLeft.pressed = true;
+        enemy.lastKey = "ArrowLeft";
+        break;
+      case "ArrowUp":
+        enemy.velocity.y = -15;
+        break;
+      case "ArrowDown":
+        // enemy.velocity.y = 5;
+        // enemy.attack();
+        break;
+    }
+  });
+
+  window.addEventListener("keyup", function (e) {
+    switch (e.key) {
+      case "d":
+        keys.d.pressed = false;
+        break;
+      case "a":
+        keys.a.pressed = false;
+        break;
+      case "w":
+        keys.w.pressed = false;
+        break;
+      case "s":
+        keys.s.pressed = false;
+        break;
+
+      case "ArrowRight":
+        keys.ArrowRight.pressed = false;
+        break;
+      case "ArrowLeft":
+        keys.ArrowLeft.pressed = false;
+        break;
+      case "ArrowUp":
+        keys.ArrowUp.pressed = false;
+        break;
+      case "ArrowDown":
+        keys.ArrowDown.pressed = false;
+        break;
+    }
+  });
+})
+
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+  <div style="position: relative; display: inline-block">
+    <div style="
+        position: absolute;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        padding: 15px;
+      ">
+      <div style="
+          position: relative;
+          height: 30px;
+          width: 100%;
+          display: flex;
+          justify-content: flex-end;
+        ">
+        <div style="background-color: yellow; width: 100%; height: 100%"></div>
+        <div style="
+            position: absolute;
+            background-color: blue;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+          " id="playerHealth"></div>
+      </div>
+      <div id="timer" style="
+          background-color: red;
+          height: 100px;
+          width: 100px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+        10
+      </div>
+      <div style="position: relative; height: 30px; width: 100%">
+        <div style="background-color: yellow; width: 100%; height: 100%"></div>
+        <div style="
+            position: absolute;
+            background-color: blue;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+          " id="enemyHealth"></div>
+      </div>
     </div>
-  </header>
-
-  <RouterView />
+    <div id="result" style="
+        position: absolute;
+        color: white;
+        /* display: flex; */
+        align-items: center;
+        justify-content: center;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: none;
+      ">
+      Result
+    </div>
+    <canvas></canvas>
+  </div>
 </template>
 
 <style>
-@import '@/assets/base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
-}
-
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+* {
+  box-sizing: border-box;
 }
 </style>
