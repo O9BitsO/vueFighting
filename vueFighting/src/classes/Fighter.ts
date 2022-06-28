@@ -103,7 +103,6 @@ export default class Fighter extends Sprite {
     if(!canvas || !gravity) return;
     this.draw(c);
     if (!this.death) this.animateFrame();
-    this.animateFrame();
     this.attackBox.position.x = this.position.x + this.attackBox.offset.x;
     this.attackBox.position.y = this.position.y + this.attackBox.offset.y;
     this.position.y += this.velocity.y;
