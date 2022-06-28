@@ -1,22 +1,50 @@
 <script setup lang="ts">
 import './styles/globalStyles.css';
 import Fighter from './classes/Fighter';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import Sprite from './classes/Sprite';
-import ResultScreen from './components/ResultScreen.vue'
+import ResultScreen from './components/ResultScreen.vue';
+import { usePointStore } from './stores/point';
 
 const battleResult = ref('');
 const start = ref('Input Title here!');
+const timerRef = ref(90);
+const point = usePointStore();
+
+function increasePoint() {
+  point.win();
+}
 
 function resetResult() {
   init();
   battleResult.value = '';
+  timerRef.value = 90;
+  countDown();
 }
 
 function startBattle() {
   init();
   start.value = '';
+  timerRef.value = 90;
+  countDown();
 }
+
+let countDownId: number;
+function countDown() {
+  if (timerRef.value > 0) {
+    countDownId = setTimeout(countDown, 1000);
+    timerRef.value--;
+  }
+  if (timerRef.value === 0) {
+    if (countDownId) clearTimeout(countDownId);
+    battleResult.value = 'Time up!';
+  }
+}
+
+// watch(battleResult, async (val) => {
+//   console.log(val);
+// })
+
 
 function init() {
   function rectangularCollision({ rectangle1, rectangle2 }: { rectangle1: Fighter, rectangle2: Fighter }) {
@@ -31,8 +59,8 @@ function init() {
     );
   }
 
-  function determineWinner({ player, enemy, timerId }: { player: Fighter, enemy: Fighter, timerId: number }) {
-    clearTimeout(timerId);
+  function determineWinner({ player, enemy }: { player: Fighter, enemy: Fighter }) {
+    if (countDownId) clearTimeout(countDownId);
     let resultBox = <HTMLElement>document.querySelector("#result");
     if (resultBox) {
       let result = '';
@@ -41,28 +69,13 @@ function init() {
       }
       if (player.health > enemy.health) {
         result = "Player 1 Win";
+        point.win();
       }
       if (player.health < enemy.health) {
         result = "Player 2 Win";
+        point.lose();
       }
-      // resultBox.innerHTML = result;
-      // resultBox.style.display = "flex";
       battleResult.value = result;
-    }
-  }
-
-  let timer = 60;
-  let timerId: number;
-  function decreaseTimer() {
-    if (timer > 0) {
-      timerId = setTimeout(decreaseTimer, 1000);
-      timer -= 1;
-      let timerBox = document.querySelector("#timer");
-      if (timerBox)
-        timerBox.innerHTML = timer.toString();
-    }
-    if (timer === 0) {
-      determineWinner({ player, enemy, timerId });
     }
   }
   const canvas = document.querySelector('canvas');
@@ -254,7 +267,7 @@ function init() {
     },
   };
 
-  decreaseTimer();
+  // decreaseTimer();
 
   function animate() {
     let animationId = window.requestAnimationFrame(animate);
@@ -338,7 +351,7 @@ function init() {
     }
     // end game
     if (enemy.health <= 0 || player.health <= 0) {
-      determineWinner({ player, enemy, timerId });
+      determineWinner({ player, enemy });
       window.cancelAnimationFrame(animationId);
       animationId = 0;
     };
@@ -435,7 +448,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div style="width: 100%; height: 100%; position: absolute; display: flex; justify-content: center; align-items: center;">
+  <div
+    style="width: 100%; height: 100%; position: absolute; display: flex; justify-content: center; align-items: center;">
+    <button @click="increasePoint">{{point.point}}</button>
     <div style="position: relative; display: inline-block;" class="border-double border-4 border-indigo-600">
       <div style="
         position: absolute;
@@ -468,8 +483,8 @@ onMounted(() => {
           display: flex;
           align-items: center;
           justify-content: center;
-        " class="bg-red-600 text-black rounded-full hover:text-red-600 hover:bg-blue-300 hover:text-3xl	">
-          10
+        " class="bg-red-600 text-black rounded-full hover:text-red-600 hover:bg-blue-300 hover:text-3xl">
+          {{ timerRef }}
         </div>
         <div style="position: relative; height: 30px; width: 100%">
           <div style="background-color: yellow; width: 100%; height: 100%"></div>
