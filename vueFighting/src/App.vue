@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Fighter from './classes/Fighter';
 import { onMounted } from 'vue';
+import Sprite from './classes/Sprite';
 
 onMounted(() => {
   function rectangularCollision({ rectangle1, rectangle2 }: { rectangle1: Fighter, rectangle2: Fighter }) {
@@ -59,6 +60,26 @@ onMounted(() => {
 
   const gravity = 0.7;
 
+  const background = new Sprite({
+    position: {
+      x: 0,
+      y: 0,
+    },
+    imageSrc: "src/assets/background.png",
+    scale: 1,
+    framesMax: 1,
+  });
+
+  const shop = new Sprite({
+    position: {
+      x: 600,
+      y: 129,
+    },
+    imageSrc: "src/assets/shop.png",
+    scale: 2.75,
+    framesMax: 6,
+  })
+
   const player = new Fighter({
     position: {
       x: 0,
@@ -70,8 +91,57 @@ onMounted(() => {
     },
     color: "red",
     offset: {
-      x: 0,
-      y: 0,
+      x: 215,
+      y: 156,
+    },
+    imageSrc: "src/assets/samuraiMack/Idle.png",
+    framesMax: 8,
+    scale: 2.5,
+    sprites: {
+      idle: {
+        imageSrc: "src/assets/samuraiMack/Idle.png",
+        framesMax: 8,
+      },
+      run: {
+        imageSrc: "src/assets/samuraiMack/Run.png",
+        framesMax: 8,
+      },
+      jump: {
+        imageSrc: "src/assets/samuraiMack/Jump.png",
+        framesMax: 2,
+      },
+      fall: {
+        imageSrc: "src/assets/samuraiMack/Fall.png",
+        framesMax: 2,
+      },
+      attack1: {
+        imageSrc: "src/assets/samuraiMack/Attack1.png",
+        framesMax: 6,
+      },
+      attack2: {
+        imageSrc: "src/assets/samuraiMack/Attack2.png",
+        framesMax: 6,
+      },
+      takeHit: {
+        imageSrc: "src/assets/samuraiMack/Take Hit - white silhouette.png",
+        framesMax: 4,
+      },
+      death: {
+        imageSrc: "src/assets/samuraiMack/Death.png",
+        framesMax: 6,
+      },
+    },
+    attackBox: {
+      position: {
+        x: 0,
+        y: 0
+      },
+      offset: {
+        x: 100,
+        y: 50,
+      },
+      width: 150,
+      height: 50,
     },
   });
 
@@ -86,8 +156,54 @@ onMounted(() => {
     },
     color: "blue",
     offset: {
-      x: -50,
-      y: 0,
+      x: 215,
+      y: 167,
+    },
+    imageSrc: "src/assets/kenji/Idle.png",
+    framesMax: 4,
+    scale: 2.5,
+    sprites: {
+      idle: {
+        imageSrc: "src/assets/kenji/Idle.png",
+        framesMax: 4,
+      },
+      run: {
+        imageSrc: "src/assets/kenji/Run.png",
+        framesMax: 8,
+      },
+      jump: {
+        imageSrc: "src/assets/kenji/Jump.png",
+        framesMax: 2,
+      },
+      fall: {
+        imageSrc: "src/assets/kenji/Fall.png",
+        framesMax: 2,
+      },
+      attack1: {
+        imageSrc: "src/assets/kenji/Attack1.png",
+        framesMax: 4,
+      },
+      attack2: {
+        imageSrc: "src/assets/kenji/Attack2.png",
+        framesMax: 4,
+      },
+      takeHit: {
+        imageSrc: "src/assets/kenji/Take hit.png",
+        framesMax: 3,
+      },
+      death: {
+        imageSrc: "src/assets/kenji/Death.png",
+        framesMax: 7,
+      },
+    },
+    attackBox: {
+      position: { x: 0, y: 0 },
+      offset: {
+        x: -100,
+        y: 50,
+      },
+      width: 120,
+      height: 50,
     },
   });
 
@@ -130,47 +246,80 @@ onMounted(() => {
     if (c && canvas) {
       c.fillStyle = 'black';
       c.fillRect(0, 0, canvas.width, canvas.height);
+      background.update(c);
+      shop.update(c);
       player.update(c, canvas, gravity);
       enemy.update(c, canvas, gravity);
 
-      // Movement
-
+      // Movement      
       player.velocity.x = 0;
       if (keys.a.pressed && player.lastKey === "a") {
         player.velocity.x = -5;
+        player.switchSprites('run');
       } else if (keys.d.pressed && player.lastKey === "d") {
         player.velocity.x = 5;
+        player.switchSprites('run');
+      } else {
+        player.switchSprites('idle');
+      }
+
+      if (player.velocity.y < 0) {
+        player.switchSprites("jump");
+      } else if (player.velocity.y > 0) {
+        player.switchSprites("fall");
       }
 
       enemy.velocity.x = 0;
       if (keys.ArrowLeft.pressed && enemy.lastKey === "ArrowLeft") {
         enemy.velocity.x = -5;
+        enemy.switchSprites('run');
       } else if (keys.ArrowRight.pressed && enemy.lastKey === "ArrowRight") {
         enemy.velocity.x = 5;
+        enemy.switchSprites('run');
+      } else {
+        enemy.switchSprites('idle');
+      }
+
+      if (enemy.velocity.y < 0) {
+        enemy.switchSprites("jump");
+      } else if (enemy.velocity.y > 0) {
+        enemy.switchSprites("fall");
       }
 
       // Colision detection
       let playerHealthBox = <HTMLElement>document.querySelector("#playerHealth");
       let enemyHealthBox = <HTMLElement>document.querySelector("#enemyHealth");
+      // Colision detection
       if (
         rectangularCollision({ rectangle1: player, rectangle2: enemy }) &&
-        player.isAttacking
+        player.isAttacking &&
+        player.framesCurrent === 4
       ) {
+        enemy.takeHit();
         player.isAttacking = false;
-        enemy.color = "green";
-        enemy.health -= 10;
-        if (enemyHealthBox) enemyHealthBox.style.width = enemy.health + "%";
-      } else enemy.color = "blue";
+        enemyHealthBox.style.width = enemy.health + "%";
+      }
+
+      //if player misses
+      if (player.isAttacking && player.framesCurrent === 4) {
+        player.isAttacking = false;
+      }
 
       if (
         rectangularCollision({ rectangle1: enemy, rectangle2: player }) &&
-        enemy.isAttacking
+        enemy.isAttacking &&
+        enemy.framesCurrent === 2
       ) {
+        player.takeHit();
         enemy.isAttacking = false;
-        player.color = "green";
-        player.health -= 10;
-        if (playerHealthBox) playerHealthBox.style.width = player.health + "%";
-      } else player.color = "red";
+        playerHealthBox.style.width = player.health + "%";
+      }
+
+      //if enemy misses
+      if (enemy.isAttacking && enemy.framesCurrent === 2) {
+        enemy.isAttacking = false;
+      }
+
     }
     // end game
     if (enemy.health <= 0 || player.health <= 0) determineWinner({ player, enemy, timerId });
@@ -178,75 +327,84 @@ onMounted(() => {
 
   animate();
   window.addEventListener("keydown", function (e) {
-    switch (e.key) {
-      case "d":
-        keys.d.pressed = true;
-        player.lastKey = "d";
-        break;
-      case "a":
-        keys.a.pressed = true;
-        player.lastKey = "a";
-        break;
-      case "w":
-        player.velocity.y = -15;
-        break;
-      case "s":
-        player.velocity.y = 5;
-        break;
-      case " ":
-        e.preventDefault();
-        player.attack();
-        break;
-
-      case "ArrowRight":
-        e.preventDefault();
-        keys.ArrowRight.pressed = true;
-        enemy.lastKey = "ArrowRight";
-        break;
-      case "ArrowLeft":
-        e.preventDefault();
-        keys.ArrowLeft.pressed = true;
-        enemy.lastKey = "ArrowLeft";
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        enemy.velocity.y = -15;
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        // enemy.velocity.y = 5;
-        enemy.attack();
-        break;
+    if (!player.death) {
+      switch (e.key) {
+        case "d":
+          keys.d.pressed = true;
+          player.lastKey = "d";
+          break;
+        case "a":
+          keys.a.pressed = true;
+          player.lastKey = "a";
+          break;
+        case "w":
+          player.velocity.y = -15;
+          break;
+        case "s":
+          player.attack();
+          break;
+        case " ":
+          player.attack();
+          e.preventDefault();
+          break;
+      }
+    }
+    if (!enemy.death) {
+      switch (e.key) {
+        case "ArrowRight":
+          keys.ArrowRight.pressed = true;
+          enemy.lastKey = "ArrowRight";
+          e.preventDefault();
+          break;
+        case "ArrowLeft":
+          keys.ArrowLeft.pressed = true;
+          enemy.lastKey = "ArrowLeft";
+          e.preventDefault();
+          break;
+        case "ArrowUp":
+          enemy.velocity.y = -15;
+          e.preventDefault();
+          break;
+        case "ArrowDown":
+          enemy.attack();
+          e.preventDefault();
+          break;
+      }
     }
   });
 
   window.addEventListener("keyup", function (e) {
-    switch (e.key) {
-      case "d":
-        keys.d.pressed = false;
-        break;
-      case "a":
-        keys.a.pressed = false;
-        break;
-      case "w":
-        keys.w.pressed = false;
-        break;
-      case "s":
-        keys.s.pressed = false;
-        break;
-
-      case "ArrowRight":
-        keys.ArrowRight.pressed = false;
-        break;
-      case "ArrowLeft":
-        keys.ArrowLeft.pressed = false;
-        break;
-      case "ArrowUp":
-        keys.ArrowUp.pressed = false;
-        break;
-      case "ArrowDown":
-        keys.ArrowDown.pressed = false;
-        break;
+    if (!player.death) {
+      switch (e.key) {
+        case "d":
+          keys.d.pressed = false;
+          break;
+        case "a":
+          keys.a.pressed = false;
+          break;
+        case "w":
+          keys.w.pressed = false;
+          break;
+        case "s":
+          keys.s.pressed = false;
+          break;
+      }
+    }
+    if (!enemy.death) {
+      switch (e.key) {
+        case "ArrowRight":
+          keys.ArrowRight.pressed = false;
+          break;
+        case "ArrowLeft":
+          keys.ArrowLeft.pressed = false;
+          break;
+        case "ArrowUp":
+          keys.ArrowUp.pressed = false;
+          break;
+        case "ArrowDown":
+          keys.ArrowDown.pressed = false;
+          break;
+      }
     }
   });
 })
