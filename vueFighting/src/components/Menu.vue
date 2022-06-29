@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import HelloWorldVue from './HelloWorld.vue';
 import TheWelcomeVue from './TheWelcome.vue';
 import WelcomeItemVue from '../App.vue';
@@ -6,14 +6,14 @@ import { ref, computed } from 'vue';
 
 const openMenu = ref(false);
 
-const currentTab = ref('HelloWorldVue');
-const tabs = {
+const currentTab:any = ref('HelloWorldVue');
+const tabs : any = {
     HelloWorldVue,
     TheWelcomeVue,
     WelcomeItemVue,
 };
 
-function selectMargin(i) {
+function selectMargin(i:number|undefined) {
     return 'ml-' + i;
 }
 
@@ -38,7 +38,7 @@ const displayMenuContent = computed(() => {
                 <hr class="mt-3 mb-3">
             <div :style="displayMenuContent" style="justify-content: center; align-items: center;">
                 <button class="rounded-full border-2 p-3 m-3 bg-red-300 transition animate-pulse hover:scale-150"
-                    @click="openMenu = false">X</button>
+                    @click="openMenu = false">x</button>
             </div>
         </div>
         <div class="p-3 rounded border-2 ml-3 mt-3" style="width: 80%; height: 90%;"
