@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import './styles/globalStyles.css';
 import Fighter from './classes/Fighter';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import Sprite from './classes/Sprite';
 import ResultScreen from './components/ResultScreen.vue';
 import { usePointStore } from './stores/point';
@@ -10,12 +10,15 @@ const battleResult = ref('');
 const start = ref('Input Title here!');
 const timerRef = ref(90);
 const point = usePointStore();
-
+let keyup = function (e: KeyboardEvent) { };
+let keydown = function (e: KeyboardEvent) { };
 function increasePoint() {
   point.win();
 }
 
 function resetResult() {
+  window.removeEventListener('keydown', keydown);
+  window.removeEventListener('keyup', keyup);
   init();
   battleResult.value = '';
   timerRef.value = 90;
@@ -23,8 +26,11 @@ function resetResult() {
 }
 
 function startBattle() {
+  window.removeEventListener('keydown', keydown);
+  window.removeEventListener('keyup', keyup);
   init();
   start.value = '';
+  battleResult.value = '';
   timerRef.value = 90;
   countDown();
 }
@@ -62,6 +68,7 @@ function init() {
   function determineWinner({ player, enemy }: { player: Fighter, enemy: Fighter }) {
     if (countDownId) clearTimeout(countDownId);
     let resultBox = <HTMLElement>document.querySelector("#result");
+    if(battleResult.value !== '') return;
     if (resultBox) {
       let result = '';
       if (player.health === enemy.health) {
@@ -358,7 +365,9 @@ function init() {
   }
 
   animate();
-  window.addEventListener("keydown", function (e) {
+
+  keydown = function (e: KeyboardEvent) {
+    console.log('down');
     if (!player.death) {
       switch (e.key) {
         case "d":
@@ -403,9 +412,9 @@ function init() {
           break;
       }
     }
-  });
-
-  window.addEventListener("keyup", function (e) {
+  }
+  keyup = function (e: KeyboardEvent) {
+    console.log('up');
     if (!player.death) {
       switch (e.key) {
         case "d":
@@ -438,11 +447,24 @@ function init() {
           break;
       }
     }
-  });
+  }
+  removeListener();
+  window.addEventListener("keydown", keydown);
+  window.addEventListener("keyup", keyup);
+
+  function removeListener() {
+    window.removeEventListener('keydown', keydown);
+    window.removeEventListener('keyup', keyup);
+  }
 }
 
 onMounted(() => {
   init();
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', keydown);
+  window.removeEventListener('keyup', keyup);
 })
 
 </script>
@@ -450,7 +472,6 @@ onMounted(() => {
 <template>
   <div
     style="width: 100%; height: 100%; position: absolute; display: flex; justify-content: center; align-items: center;">
-    <button @click="increasePoint">{{point.point}}</button>
     <div style="position: relative; display: inline-block;" class="border-double border-4 border-indigo-600">
       <div style="
         position: absolute;

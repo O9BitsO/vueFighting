@@ -1,10 +1,12 @@
-import { createApp } from 'vue'
+import { createApp, createSSRApp } from 'vue'
 import { createPinia } from 'pinia'
 import './index.css'
+// import Emitter from 'tiny-emitter';
 
 import App from './App.vue'
 import router from './router'
 import Menu from './components/Menu.vue'
+import RouteMenu from './components/RouteMenu.vue'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -26,6 +28,8 @@ const a = initializeApp(firebaseConfig);
 
 // const app = createApp(App)
 const app = createApp(Menu)
+app.config.globalProperties.$msalInstance = {};
+// app.config.globalProperties.$emitter = new Emitter();
 
 app.use(createPinia())
 app.use(router)

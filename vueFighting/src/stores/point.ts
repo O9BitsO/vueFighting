@@ -3,14 +3,19 @@ import { defineStore } from "pinia";
 export const usePointStore = defineStore({
   id: "point",
   state: () => ({
-    point: 0,
+    winP: 0,
+    loseP:0,
   }),
+  getters: {
+    getPlayerPoint: (state) => state.winP - state.loseP,
+    getEnemyPoint: (state) => state.loseP - state.winP,
+  },
   actions: {
     win() {
-      this.point++;
+      this.winP++;
     },
     lose() {
-      this.point--;
+      this.loseP++;
     },
   },
 });
