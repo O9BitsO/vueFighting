@@ -3,10 +3,16 @@ import HomeView from '../views/HomeView.vue';
 import Score from '../components/ScoreBoard.vue';
 import LoginScreen from '../components/LoginScreen.vue';
 import Game from '../App.vue';
+import Page1 from '../pages/page1.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/page1',
+      name: 'page1',
+      component: Page1
+    },
     {
       path: '/score',
       name: 'score',

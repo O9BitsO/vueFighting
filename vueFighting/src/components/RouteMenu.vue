@@ -9,9 +9,9 @@
             <br>
             <router-link to="/Login">Login</router-link>
         </div>
-        <div>
+        <!-- <div>
             <router-view></router-view>
-        </div>
+        </div> -->
     </div>
 </template>
 <style>
