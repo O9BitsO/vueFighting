@@ -7,7 +7,7 @@ import App from './App.vue'
 import router from './router'
 import Menu from './components/Menu.vue'
 import RouteMenu from './components/RouteMenu.vue'
-import Page1 from './pages/page1.vue'
+import Page1 from './pages/draw.vue'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
