@@ -2,12 +2,13 @@
 import Proto from "../components/prototype.vue";
 import drawZone from "@/components/drawZone.vue";
 import actionMenu from "@/components/actionMenu.vue";
+import colorPicker from "@/components/colorPicker.vue";
+import banner from "@/components/banner.vue";
 import { onMounted, ref, watch, computed } from 'vue';
 
 const drawingColor = ref('black');
 
 function changeColor(color: string) {
-    console.log(color);
     drawingColor.value = color;
 }
 </script>
@@ -15,10 +16,11 @@ function changeColor(color: string) {
     <div>
         <Proto>
             <template v-slot:header>
-                a
+                <banner></banner>
             </template>
             <template v-slot:navBar>
                 <actionMenu :color="drawingColor" @changeColor="changeColor"></actionMenu>
+                <colorPicker @changeColor="changeColor" :baseColor="drawingColor"></colorPicker>
             </template>
             <template v-slot:content>
                 <drawZone :color="drawingColor"></drawZone>

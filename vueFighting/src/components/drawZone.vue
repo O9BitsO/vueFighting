@@ -10,7 +10,7 @@ const props = defineProps(['color']);
 
 
 function init() {
-    canvas = document.querySelector('canvas');
+    canvas = <HTMLCanvasElement>document.getElementById('drawBoard');
     if (!canvas) return;
     c = canvas.getContext('2d');
     if (!c) return;
@@ -26,9 +26,8 @@ function init() {
 
 function draw() {
     if (!c) return;
-    console.log('I am drawing!!!');
     c.fillStyle = props.color;
-    c.fillRect(mouse.value.x - boardPos.value.x, mouse.value.y - boardPos.value.y, 1, 1);
+    c.fillRect(mouse.value.x - boardPos.value.x, mouse.value.y - boardPos.value.y, 3, 3);
 }
 
 // watch(drawing, async (isDrawing: boolean) => {
