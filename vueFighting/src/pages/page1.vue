@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import Proto from "../components/prototype.vue";
 import Menu from "../components/RouteMenu.vue";
+import Banner from "../components/banner.vue"
 </script>
 <template>
     <div>
         <Proto>
             <template v-slot:header>
                 <div>
-                    <p>Random Header</p>
+                    <Banner></Banner>
                 </div>
             </template>
             <template v-slot:navBar>
@@ -17,7 +18,7 @@ import Menu from "../components/RouteMenu.vue";
             </template>
             <template v-slot:content>
                 <div>
-                    <router-view></router-view>
+                    <router-view name="second"></router-view>
                 </div>
             </template>
         </Proto>

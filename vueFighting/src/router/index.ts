@@ -10,30 +10,42 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/draw',
-      name: 'draw',
+      path: '/',
+      name: '',
       component: Draw
     },
     {
       path: '/page1',
       name: 'page1',
-      component: Page1
+      component: Page1,
+      children: [{
+        path: 'score',
+        components: {second: Score}
+      },
+      {
+        path: 'game',
+        components: {second: Game}
+      },
+      {
+        path: 'login',
+        components: {second: LoginScreen}
+      }]
     },
-    {
-      path: '/score',
-      name: 'score',
-      component: Score
-    },
-    {
-      path: '/game',
-      name: 'game',
-      component: Game
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: LoginScreen
-    },
+    // {
+    //   path: '/score',
+    //   name: 'score',
+    //   components: {second: Score}
+    // },
+    // {
+    //   path: '/game',
+    //   name: 'game',
+    //   components: {second: Game}
+    // },
+    // {
+    //   path: '/login',
+    //   name: 'login',
+    //   components: {second: LoginScreen}
+    // },
     {
       path: '/about',
       name: 'about',

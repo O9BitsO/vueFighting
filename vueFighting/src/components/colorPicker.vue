@@ -12,9 +12,7 @@ function selectColor(event: MouseEvent) {
     let pixel = ColorCtx?.getImageData(x, y, 1, 1)['data'];   // Read pixel Color
     if (!pixel) return;
     let rgb = `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
-    // console.log(rgb);
     document.body.style.background = rgb;    // Set this color to body of the document
-    // updateSelectedColor(rgb);
     emit('changeColor', rgb);
 }
 
