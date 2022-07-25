@@ -8,6 +8,7 @@ import router from './router'
 import Menu from './components/Menu.vue'
 import RouteMenu from './components/RouteMenu.vue'
 import Page1 from './pages/draw.vue'
+import index from './index.vue'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -28,7 +29,7 @@ const firebaseConfig = {
 const a = initializeApp(firebaseConfig);
 
 // const app = createApp(App)
-const app = createApp(Page1)
+const app = createApp(index)
 app.config.globalProperties.$msalInstance = {};
 // app.config.globalProperties.$emitter = new Emitter();
 

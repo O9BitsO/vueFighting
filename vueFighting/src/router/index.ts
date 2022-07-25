@@ -4,10 +4,16 @@ import Score from '../components/ScoreBoard.vue';
 import LoginScreen from '../components/LoginScreen.vue';
 import Game from '../App.vue';
 import Page1 from '../pages/page1.vue';
+import Draw from '../pages/draw.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/draw',
+      name: 'draw',
+      component: Draw
+    },
     {
       path: '/page1',
       name: 'page1',
