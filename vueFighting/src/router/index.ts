@@ -4,6 +4,7 @@ import Score from '../components/ScoreBoard.vue';
 import LoginScreen from '../components/LoginScreen.vue';
 import Game from '../App.vue';
 import Page1 from '../pages/page1.vue';
+import Page2 from '../pages/page2.vue';
 import Draw from '../pages/draw.vue';
 
 const router = createRouter({
@@ -13,6 +14,11 @@ const router = createRouter({
       path: '/',
       name: '',
       component: Draw
+    },
+    {
+      path: '/page2',
+      name: 'page2',
+      component: Page2
     },
     {
       path: '/page1',
