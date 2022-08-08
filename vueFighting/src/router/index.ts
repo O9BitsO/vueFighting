@@ -5,11 +5,17 @@ import LoginScreen from '../components/LoginScreen.vue';
 import Game from '../App.vue';
 import Page1 from '../pages/page1.vue';
 import Page2 from '../pages/page2.vue';
+import Babylon from '../pages/babylon.vue';
 import Draw from '../pages/draw.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/3d',
+      name: '3d',
+      component: Babylon
+    },
     {
       path: '/',
       name: '',
