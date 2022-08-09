@@ -6,6 +6,7 @@ import Game from '../App.vue';
 import Page1 from '../pages/page1.vue';
 import Page2 from '../pages/page2.vue';
 import Babylon from '../pages/babylon.vue';
+import LoginFirebase from '../pages/firebaseLogin.vue';
 import Draw from '../pages/draw.vue';
 
 const router = createRouter({
@@ -15,6 +16,11 @@ const router = createRouter({
       path: '/3d',
       name: '3d',
       component: Babylon
+    },
+    {
+      path: '/signin',
+      name: 'signin',
+      component: LoginFirebase
     },
     {
       path: '/',
