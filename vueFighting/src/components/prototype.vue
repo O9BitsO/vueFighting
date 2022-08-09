@@ -1,7 +1,7 @@
 <script setup lang="ts">
 </script>
 <template>
-    <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; flex-direction: column; align-items: center;">
+    <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; flex-direction: column; align-items: center; overflow: auto;">
         <header class="bg-blue-300 border m-3 p-3" style="width: 90%; height: 10%; top: 0; left: 0;">
             <slot name="header"></slot>
         </header>

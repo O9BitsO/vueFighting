@@ -2,6 +2,9 @@
 import Login from './LoginScreen.vue';
 import Score from './ScoreBoard.vue';
 import Game from '../App.vue';
+import page1Vue from '@/pages/page1.vue';
+import firebaseLoginVue from '@/pages/firebaseLogin.vue';
+import babylonVue from '@/pages/babylon.vue';
 import { ref, computed } from 'vue';
 
 const openMenu = ref(false);
@@ -12,6 +15,9 @@ const tabs: any = {
     Login,
     Score,
     Game,
+    page1Vue,
+    firebaseLoginVue,
+    babylonVue,
 };
 
 function selectMargin(i: number | undefined) {

@@ -47,11 +47,10 @@ function googleSignout() {
 </script>
 <template>
     <div style="display: flex; align-items: center; justify-content: center;">
-        <input type="text" v-model="emailField">
         <img v-if="isLogin" :src=userInfo.getUserPhoto alt="a">
-        <button v-if="isLogin" class="m-3 p-3 bg-red-300" @click="googleSignout">Logout</button>
+        <button v-if="isLogin" class="m-3 p-3 bg-red-300 border border-l-purple-900" @click="googleSignout">Logout</button>
         <div v-else>
-            <button class="m-3 p-3 bg-red-300" @click="googleSignin">Login with Google</button>
+            <button class="m-3 p-3 bg-red-300 border border-l-purple-900" @click="googleSignin">Login with Google</button>
         </div>
     </div>
 </template>

@@ -8,6 +8,7 @@ import Page2 from '../pages/page2.vue';
 import Babylon from '../pages/babylon.vue';
 import LoginFirebase from '../pages/firebaseLogin.vue';
 import Draw from '../pages/draw.vue';
+import Menu from '../components/Menu.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +17,11 @@ const router = createRouter({
       path: '/3d',
       name: '3d',
       component: Babylon
+    },
+    {
+      path: '/nav',
+      name: 'nav',
+      component: Menu
     },
     {
       path: '/gg',
@@ -43,6 +49,14 @@ const router = createRouter({
       {
         path: 'game',
         components: {second: Game}
+      },
+      {
+        path: '3d',
+        components: {second: Babylon}
+      },
+      {
+        path: 'GoogleSignin',
+        components: {second: LoginFirebase}
       },
       {
         path: 'login',
