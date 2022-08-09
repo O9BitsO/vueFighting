@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+import { useUserInfoStore } from '../stores/userInfo';
+const userInfo = useUserInfoStore();
 const provider = new GoogleAuthProvider();
 const auth = getAuth();
 
-
+const isLogin = ref(false);
 const emailField = ref('');
+const userPhoto = ref(userInfo.getUserPhoto);
+console.log(userPhoto);
 function googleSignin() {
     signInWithPopup(auth, provider)
         .then((result) => {
@@ -14,7 +18,10 @@ function googleSignin() {
             const token = credential?.accessToken;
             // The signed-in user info.
             const user = result.user;
-            console.log(user);
+            isLogin.value = true;
+            if(!user.email || !user.displayName || !user.photoURL) return;
+            userInfo.setUserInfo({email: user.email, displayName: user.displayName, photoURL: user.photoURL});
+            userPhoto.value = user.photoURL;
             // ...
         }).catch((error) => {
             // Handle Errors here.
@@ -23,7 +30,7 @@ function googleSignin() {
             // The email of the user's account used.
             const email = error.customData.email;
             // The AuthCredential type that was used.
-            const credential = GoogleAuthProvider.credentialFromError(error);
+            const credential = GoogleAuthProvider.credentialFromError(error);            
             // ...
         });
 }
@@ -31,6 +38,8 @@ function googleSignout() {
     signOut(auth).then(() => {
         // Sign-out successful.
         console.log('Sign-out successful');
+        isLogin.value = false;
+        userInfo.setUserInfo({email: '', displayName: '', photoURL: ''});
     }).catch((error) => {
         // An error happened.
     });
@@ -39,7 +48,11 @@ function googleSignout() {
 <template>
     <div style="display: flex; align-items: center; justify-content: center;">
         <input type="text" v-model="emailField">
-        <button class="m-3 p-3 bg-red-300" @click="googleSignin">Login with Google</button>
+        <img v-if="isLogin" :src=userInfo.getUserPhoto alt="a">
+        <button v-if="isLogin" class="m-3 p-3 bg-red-300" @click="googleSignout">Logout</button>
+        <div v-else>
+            <button class="m-3 p-3 bg-red-300" @click="googleSignin">Login with Google</button>
+        </div>
     </div>
 </template>
 <style>

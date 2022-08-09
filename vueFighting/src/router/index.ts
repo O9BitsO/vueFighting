@@ -18,8 +18,8 @@ const router = createRouter({
       component: Babylon
     },
     {
-      path: '/signin',
-      name: 'signin',
+      path: '/gg',
+      name: 'gg',
       component: LoginFirebase
     },
     {

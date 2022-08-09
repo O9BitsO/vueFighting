@@ -3,11 +3,11 @@
 <template>
     <div>
         <div>
-            <router-link to="Score">Score</router-link>
+            <router-link to="/page1/Score">Score</router-link>
             <br>
-            <router-link to="Game">Game</router-link>
+            <router-link to="/page1/Game">Game</router-link>
             <br>
-            <router-link to="Login">Login</router-link>
+            <router-link to="/page1/Login">Login</router-link>
         </div>
     </div>
 </template>
