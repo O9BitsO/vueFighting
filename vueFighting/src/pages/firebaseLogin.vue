@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { useUserInfoStore } from '../stores/userInfo';
 const userInfo = useUserInfoStore();
@@ -7,9 +7,7 @@ const provider = new GoogleAuthProvider();
 const auth = getAuth();
 
 const isLogin = ref(false);
-const emailField = ref('');
 const userPhoto = ref(userInfo.getUserPhoto);
-console.log(userPhoto);
 function googleSignin() {
     signInWithPopup(auth, provider)
         .then((result) => {
@@ -41,9 +39,27 @@ function googleSignout() {
         isLogin.value = false;
         userInfo.setUserInfo({email: '', displayName: '', photoURL: ''});
     }).catch((error) => {
+        console.log(
+            `Errors:
+            ---------
+            ${error}
+            ---------`
+        );
         // An error happened.
     });
 }
+
+onMounted(()=>{
+    console.log(
+    `User photo:
+    -----------------
+    ${userPhoto.value}
+    -----------------`
+    );
+    if(userPhoto.value !== '') {
+        isLogin.value = true;
+    }
+});
 </script>
 <template>
     <div style="display: flex; align-items: center; justify-content: center;">
